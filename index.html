@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dieplam Nguyen | Portfolio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Xanh+Mono:ital@0;1&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,11 +20,16 @@
       --accent-light: #EAF0EC;
       --accent2: #B85C38;
       --border: rgba(0,0,0,0.08);
-      --serif: 'DM Serif Display', Georgia, serif;
-      --sans: 'DM Sans', system-ui, sans-serif;
+      --serif: 'Xanh Mono', Georgia, serif;
+      --sans: 'MS Gothic', 'MS PGothic', 'Courier New', monospace;
     }
 
     html { scroll-behavior: smooth; }
+
+    nav, main, footer {
+      position: relative;
+      z-index: 1;
+    }
 
     body {
       font-family: var(--sans);
@@ -127,10 +132,8 @@
       background: var(--accent-light);
       color: var(--accent);
       border-radius: 12px;
-      padding: 1rem 1.25rem;
+      padding: 1rem 1rem;
       font-size: 0.78rem;
-      font-weight: 500;
-      line-height: 1.6;
       text-align: center;
       white-space: nowrap;
     }
@@ -331,15 +334,113 @@
       margin-top: 2rem;
     }
 
+  .hero-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+  }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+
+  justify-content: center;
+  align-items: center;
+}
+
+/* smaller, cleaner popup */
+.modal-content {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+
+  width: 85%;
+  max-width: 420px;
+  
+  text-align: center;
+  position: relative;
+
+  animation: fadeUp 0.25s ease;
+}
+
+.modal-content img {
+  width: 80%; 
+  max-width: 350px;
+  height: auto;
+  border-radius: 10px;
+  margin: 1rem auto;
+  display: block;
+}
+
+.close {
+  float: right;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
     /* ANIMATION */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+
+/* ═════════════════════
+   floating dots background
+   ═════════════════════ */
+
+.dots-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.dot {
+  position: absolute;
+  animation: floatDot ease-in-out infinite;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+@keyframes floatDot {
+  0% {
+    transform: translateY(110vh) translateX(0px) scale(0.8);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: var(--dot-opacity);
+    transform: translateY(80vh) translateX(calc(var(--drift) * 0.3)) scale(1);
+  }
+
+  40% {
+    transform: translateY(50vh) translateX(calc(var(--drift) * -0.6)) scale(1.05);
+  }
+
+  60% {
+    transform: translateY(20vh) translateX(calc(var(--drift) * 0.8)) scale(1.1);
+  }
+
+  80% {
+    transform: translateY(0vh) translateX(calc(var(--drift) * -0.4)) scale(1.15);
+    opacity: var(--dot-opacity);
+  }
+
+  100% {
+    transform: translateY(-20vh) translateX(calc(var(--drift))) scale(1.2);
+    opacity: 0;
+  }
+}
+
   </style>
 </head>
 <body>
 
+  <div class="dots-bg" id="dots-bg"></div>
   <nav>
     <a class="nav-name" href="#">Dieplam Nguyen</a>
     <div class="nav-links">
@@ -362,8 +463,8 @@
         </div>
       </div>
       <div class="hero-badge">
-        <span class="big">UCF</span>
-        IT B.S.<br>Spring 2027
+        <img src="hs.png" alt="HS Logo" class="hero-img">
+        <div>this is me!</div>
       </div>
     </div>
 
@@ -371,7 +472,7 @@
     <section id="about">
       <p class="section-label">About</p>
       <p class="about-text">A senior information technology bachelors student. Working professionally with human computer interaction, project & product development, and virtual networks.
-        My special interest are cognitive functions, Jungian typology and Nietzche philosophy. :)
+        My special interests are cognitive functions, Jungian typology and Nietzche philosophy!
       </p>
       <div class="skills-grid">
         <div class="skill-card">
@@ -532,13 +633,101 @@
     <p>Made by Dieplam Nguyen &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Last updated: 4-11-26</p>
   </footer>
 
+  <!-- MODAL -->
+<div id="projectModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id="modal-title"></h2>
+    <img id="modal-img" src="" alt="" />
+    <p id="modal-desc"></p>
+  </div>
+</div>
+
+<script>
+const modal = document.getElementById("projectModal");
+const modalTitle = document.getElementById("modal-title");
+const modalDesc = document.getElementById("modal-desc");
+const modalImg = document.getElementById("modal-img");
+const closeBtn = document.querySelector(".close");
+
+document.querySelectorAll(".proj-card").forEach(card => {
+  card.addEventListener("click", () => {
+    const title = card.querySelector("h3").innerText;
+
+    modalTitle.innerText = title;
+
+    const images = {
+      "Shopping Cart GUI": "pj2.png",
+      "UCF Style Guide Project Manager": "pj1.png",
+      "Interactive Quiz Website": "pj3.png",
+      "Multi-Tier Web Server for Enterprise Cliental": "pj4.png",
+      "Psychology Core Study Website": "pj5.png",
+      "Clock Web App": "pj6.png",
+      "Enterprise Cliental GUI": "pj7.png",
+    };
+
+    const descriptions = {
+      "Shopping Cart GUI": "Built using Java Swing, this project simulates a full e-commerce workflow including item search, cart management, and invoice generation. Focused on UI responsiveness and database interaction.",
+      
+      "UCF Style Guide Project Manager": "Led a writing team using Agile methods to produce a professional style guide. Responsible for planning, delegation, and ensuring consistency across all documentation.",
+      
+      "Interactive Quiz Website": "Designed as a research tool to study user interaction and awareness of AAPI representation. Includes user flow testing and observational data collection.",
+      
+      "Multi-Tier Web Server for Enterprise Cliental": "Developed a full-stack Java web application using Apache Tomcat. Implemented authentication, role-based access, and SQL queries through JSP and Servlets.",
+      
+      "Psychology Core Study Website": "Educational platform summarizing 12 AP Psychology studies with structured analysis, evaluations, and clean UI design for readability.",
+      
+      "Clock Web App": "An HCI-focused alarm system that forces users to complete a Wordle-style challenge to disable alarms. Designed using behavioral psychology principles.",
+      
+      "Enterprise Cliental GUI": "Two-tier Java application with separate interfaces for clients and accountants. Includes secure login and database transaction handling using JDBC."
+    };
+
+    modalDesc.innerText = descriptions[title] || "No description available.";
+    modalImg.src = images[title] || "default.png";
+
+    modal.style.display = "flex";
+  });
+});
+
+// close
+closeBtn.onclick = () => modal.style.display = "none";
+window.onclick = (e) => {
+  if (e.target == modal) modal.style.display = "none";
+};
+
+const container = document.getElementById("dots-bg");
+const colors = ["#2A4A3E", "#B85C38", "#6B6B66"];
+const notes = ["♪", "♫", "♬"];
+
+for (let i = 0; i < 40; i++) {
+  const dot = document.createElement("div");
+  dot.classList.add("dot");
+
+  const depth = Math.random();
+  const size = 4 + depth * 10;
+  const blur = 6 + depth * 12;
+  const opacity = 0.15 + depth * 0.25;
+  const speed = 18 + (1 - depth) * 30;
+  const drift = 20 + Math.random() * 40;
+  dot.style.setProperty("--drift", `${drift}px`);
+
+  dot.innerText = notes[Math.floor(Math.random() * notes.length)];
+  dot.style.color = colors[Math.floor(Math.random() * colors.length)];
+  dot.style.fontSize = `${size * 2}px`;
+  dot.style.background = "transparent";
+
+  dot.style.top = `${Math.random() * 100}vh`;
+  dot.style.left = `${Math.random() * 100}%`;
+  dot.style.animationDuration = `${speed}s`;
+  dot.style.animationDelay = `${Math.random() * 10}s`;
+
+  dot.style.setProperty("--blur", `${blur}px`);
+  dot.style.setProperty("--dot-opacity", opacity);
+
+  container.appendChild(dot);
+}
+
+</script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
